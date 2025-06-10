@@ -1,0 +1,107 @@
+/* style.css */
+body {
+  background: #f4f8fb;
+  color: #222;
+  font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  margin-top: 40px;
+  margin-bottom: 50px;
+}
+
+.section-card {
+  background-color: #fff;
+  color: #222;
+  padding: 25px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 4px 10px #e0e0e0;
+  margin-bottom: 30px;
+}
+
+.section-card input,
+.section-card textarea,
+.section-card select,
+.section-card button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 6px;
+  border: 1px solid #bfc9d1;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+/*styiling for buttons of timetable,events,complaint */
+.section-card button {
+  background-color: black;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.section-card button:hover {
+  background-color:blue;
+}
+
+/* Dark mode */
+body.dark {
+  background: #181a1b;
+  color: #f4f8fb;
+}
+
+body.dark .section-card {
+  background-color: #23272b;
+  color: #f4f8fb;
+  box-shadow: 0 4px 10px #111;
+}
+
+body.dark .section-card input,
+body.dark .section-card textarea,
+body.dark .section-card select {
+  background-color: #181a1b;
+  color: #f4f8fb;
+  border: 1px solid #444;
+}
+
+body.dark .section-card button {
+  background-color: black;
+  color: #fff;
+}
+
+body.dark .section-card button:hover {
+  background-color: yellow;
+  color: #222;
+}
+main {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+/*styling for cards of room,feedback,notes aqua*/
+.card {
+  background-color:black;
+  color:white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  width: 180px;
+}
+
+.card:hover {
+  background-color: blue;
+  transform: scale(1.05);
+}

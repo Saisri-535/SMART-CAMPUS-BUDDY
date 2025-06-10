@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart Campus Buddy</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* you can add dark mode CSS here */
+  </style>
+</head>
+<body>
+  <button onclick="document.body.classList.toggle('dark')">Toggle Theme</button>
+
+  <header>
+    <h1>Welcome to Smart Campus Buddy</h1>
+    <p>Your simple student assistant</p>
+  </header>
+
+  <main>
+    <div class="card" onclick="location.href='rooms.html'">RoomRadar</div>
+    <div class="card" onclick="location.href='aqua.html'">AquaPulse</div>
+    <div class="card" onclick="location.href='notes.html'">NotesCorner</div>
+    <div class="card" onclick="location.href='feedback.html'">Feedback</div>
+  </main>
+
+  <!-- Admin Timetable -->
+  <section id="admin-timetable" class="section-card">
+    <h2>Update Timetable</h2>
+    <form id="timetableForm">
+      <input type="text" name="year" placeholder="Year (e.g., 2nd Year)" required />
+      <input type="text" name="semester" placeholder="Semester (e.g., Sem 2)" required />
+      <input type="text" name="day" placeholder="Day (e.g., Monday)" required />
+      <input type="text" name="slot" placeholder="Time Slot (e.g., 9:00 - 10:00)" required />
+      <input type="text" name="subject" placeholder="Subject (e.g., DBMS)" required />
+      <button type="submit">Add to Timetable</button>
+    </form>
+    <p id="ttStatus"></p>
+  </section>
+
+  <!-- Admin Events -->
+  <section id="admin-events" class="section-card">
+    <h2>Add Upcoming Event</h2>
+    <form id="eventForm">
+      <inputtype="date" name="eventDate" required />
+      <input type="text" name="eventTitle" placeholder="Event Title" required />
+      <textarea name="eventDetails" placeholder="Event Details" required></textarea>
+      <button type="submit">Add Event</button>
+    </form>
+    <p id="eventStatus"></p>
+  </section>
+
+  <!-- Complaint Box -->
+  <section id="complaint-box" class="section-card">
+    <h2>Complaint Box</h2>
+    <form id="complaintForm">
+      <input type="text" placeholder="Your Name (optional)" name="name" />
+      <input type="text" placeholder="Location (Room/Block)" required name="location" />
+      <textarea placeholder="Describe the issue" required name="issue"></textarea>
+      <button type="submit">Submit Complaint</button>
+    </form>
+    <p id="complaintStatus"></p>
+  </section>
+
+  <footer> Designed by Saisri Gandla</footer>
+ 
+</body>
+</html>
