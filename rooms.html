@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RoomRadar - Room Status</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { background: white; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; }
+    .container {
+      max-width: 500px; margin: 40px auto; background: black; border-radius: 16px;
+      box-shadow: 0; padding: 32px 24px;
+    }
+    h2 { text-align: center; color: white; margin-bottom: 24px; }
+    form {
+      background: black; border-radius: 10px; padding: 20px; margin-bottom: 32px;
+      box-shadow: 0 2px 8px;
+    }
+    form input, form select, form button {
+      width: 100%; margin: 8px 0 16px 0; padding: 10px; border-radius: 6px;
+      border: 1px solid #bfc9d1; font-size: 16px; box-sizing: border-box;
+    }
+    form button {
+      background: white; color: black; border: none; font-weight: bold; cursor: pointer;
+      transition: background 0.2s;
+    }
+    form button:hover { background: yellow; }
+    #roomStatus { text-align: center; font-weight: 600; color: #279ac1; }
+    .rooms-list { margin-top: 30px; }
+    .room-card {
+      background: #f9fafb; border-radius: 8px; box-shadow: 0 1px 4px rgba(39,154,193,0.07);
+      padding: 14px 18px; margin-bottom: 10px; border-left: 5px solid #279ac1;
+    }
+    .room-meta { font-size: 0.95em; color: #555; }
+    .vacant { color: #27ae60; font-weight: bold; }
+    .occupied { color: #e67e22; font-weight: bold; }
+    @media (max-width: 600px) { .container { padding: 10px; } form { padding: 10px; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Update Room Status</h2>
+    <p id="roomStatus"></p>
+    <form id="roomForm">
+      <input type="text" name="roomNumber" placeholder="Room Number" required>
+      <input type="text" name="facultyIncharge" placeholder="Faculty Incharge" required>
+      <label for="statusSelect">Room Status</label>
+      <select name="status" id="statusSelect" required>
+        <option value="">Select Status</option>
+        <option value="vacant">Vacant</option>
+        <option value="occupied">Occupied</option>
+      </select>
+      <button type="submit">Update Status</button>
+      <p id="roomStatus"></p>
+    </form>
+    <div class="rooms-list" id="roomsList"></div>
+  </div>
+  <script>
+    // Submit handler
+    document.getElementById("roomForm").addEventListener("submit", async function(e){
+      e.preventDefault();
+      const formData = new FormData(this);
+      const data = {
+        roomNumber: formData.get("roomNumber"),
+        facultyIncharge: formData.get("facultyIncharge"),
+        status: formData.get("status")
+      };
+      const response = await fetch("http://localhost:3001/api/roomradar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      if (response.ok) {
+        document.getElementById("roomStatus").textContent = "Room status updated!";
+        this.reset();
+        loadRooms();
+      } else {
+        document.getElementById("roomStatus").textContent = "Failed to update status.";
+      }
+    });
+
+    // Display rooms
+    function loadRooms() {
+      fetch("http://localhost:3001/api/roomradar")
+        .then(res => res.json())
+        .then(rooms => {
+          const list = document.getElementById("roomsList");
+          list.innerHTML = "";
+          rooms.reverse().forEach(room => {
+            const card = document.createElement("div");
+            card.className = "room-card";
+            card.innerHTML = `
+              <div><strong>Room ${room.roomNumber}</strong> - <span class="${room.status}">${room.status.toUpperCase()}</span></div>
+              <div class="room-meta">Faculty: ${room.facultyIncharge} | ${new Date(room.lastUpdated).toLocaleString()}</div>
+            `;
+            list.appendChild(card);
+          });
+        });
+    }
+    loadRooms();
+  </script>
+</body>
+</html>

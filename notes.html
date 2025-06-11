@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Question Bank & NotesCorner</title>
+  <style>
+    body {
+      background: black;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: black;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px white;
+      padding: 32px 24px;
+    }
+    h2 {
+      text-align: center;
+      color: white;
+      margin-bottom: 24px;
+    }
+    form {
+      background: black;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 32px;
+      box-shadow: 0 2px 8px white;
+    }
+    form input, form textarea, form select, form button {
+      width: 100%;
+      margin: 8px 0 16px 0;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #bfc9d1;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    form button {
+      background: white;
+      color: black;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    form button:hover {
+      background: yellow;
+    }
+    .notes-group {
+      margin-bottom: 32px;
+    }
+    .notes-year {
+      font-size: 1.2em;
+      color: #1867c0;
+      margin-top: 24px;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    .notes-sem {
+      font-size: 1em;
+      color: #2d3a4b;
+      margin: 12px 0 6px 0;
+      font-weight: 500;
+    }
+    .note-card {
+      background: #f9fafb;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(44, 130, 201, 0.07);
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-left: 5px solid white;
+    }
+    .note-title {
+      font-weight: bold;
+      color: white;
+    }
+    .note-meta {
+      font-size: 0.95em;
+      color: black;
+    }
+    .note-link {
+      color: #1867c0;
+      text-decoration: underline;
+      font-weight: 500;
+    }
+    @media (max-width: 600px) {
+      .container { padding: 10px; }
+      form { padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>NotesCorner</h2>
+    <form id="notesForm">
+      <input type="text" name="title" placeholder="Title" required>
+      <textarea name="description" placeholder="Description" required></textarea>
+      <input type="url" name="fileUrl" placeholder="File URL (PDF/Video/Doc)" required>
+      <input type="text" name="uploadedBy" placeholder="Uploaded By" required>
+      <input type="text" name="subject" placeholder="Subject" required>
+      <label for="typeSelect">Type</label>
+      <select id="typeSelect" name="type" required>
+        <option value="">Select Type</option>
+        <option value="note">Note</option>
+        <option value="pdf">PDF</option>
+        <option value="video">Video</option>
+        <option value="pyq">PYQ</option>
+      </select>
+      <label for="yearSelect">Year</label>
+      <select id="yearSelect" name="year" required>
+        <option value="">Select Year</option>
+        <option value="1st Year">1st Year</option>
+        <option value="2nd Year">2nd Year</option>
+        <option value="3rd Year">3rd Year</option>
+        <option value="4th Year">4th Year</option>
+      </select>
+      <label for="semesterSelect">Semester</label>
+      <select id="semesterSelect" name="semester" required>
+        <option value="">Select Semester</option>
+        <option value="1st Sem">1st Sem</option>
+        <option value="2nd Sem">2nd Sem</option>
+      </select>
+      <button type="submit">Upload</button>
+      <p id="notesStatus"></p>
+    </form>
+
+    <div id="notesList"></div>
+  </div>
+  <script>
+    // Handle form submission
+    document.getElementById("notesForm").addEventListener("submit", async function(e){
+      e.preventDefault();
+      const formData = new FormData(this);
+      const data = {
+        title: formData.get("title"),
+        description: formData.get("description"),
+        fileUrl: formData.get("fileUrl"),
+        uploadedBy: formData.get("uploadedBy"),
+        subject: formData.get("subject"),
+        type: formData.get("type"),
+        year: formData.get("year"),
+        semester: formData.get("semester")
+      };
+      const response = await fetch("http://localhost:3001/api/notescorner", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      if (response.ok) {
+        document.getElementById("notesStatus").textContent = "Note uploaded!";
+        this.reset();
+        loadNotes(); // Refresh notes list
+      } else {
+        document.getElementById("notesStatus").textContent = "Failed to upload note.";
+      }
+    });
+
+    // Group and display notes
+    function loadNotes() {
+      fetch("http://localhost:3001/api/notescorner")
+        .then(res => res.json())
+        .then(notes => {
+          // Group notes by year and semester
+          const grouped = {};
+          notes.forEach(note => {
+            const year = note.year || "Other Year";
+            const sem = note.semester || "Other Sem";
+            if (!grouped[year]) grouped[year] = {};
+            if (!grouped[year][sem]) grouped[year][sem] = [];
+            grouped[year][sem].push(note);
+          });
+
+          const list = document.getElementById("notesList");
+          list.innerHTML = "";
+
+          Object.keys(grouped).forEach(year => {
+            const yearDiv = document.createElement("div");
+            yearDiv.className = "notes-group";
+            yearDiv.innerHTML = `<div class="notes-year">${year}</div>`;
+
+            Object.keys(grouped[year]).forEach(sem => {
+              const semDiv = document.createElement("div");
+              semDiv.className = "notes-sem";
+              semDiv.innerHTML = `<div class="notes-sem">${sem}</div>`;
+
+              grouped[year][sem].forEach(note => {
+                const card = document.createElement("div");
+                card.className = "note-card";
+                card.innerHTML = `
+                  <div class="note-title">${note.type ? note.type.toUpperCase() + " - " : ""}${note.title}</div>
+                  <div class="note-meta">${note.subject} | Uploaded by: ${note.uploadedBy}</div>
+                  <div class="note-meta">${note.description}</div>
+                  <a class="note-link" href="${note.fileUrl}" target="_blank" rel="noopener">Open File</a>
+                `;
+                semDiv.appendChild(card);
+              });
+
+              yearDiv.appendChild(semDiv);
+            });
+
+            list.appendChild(yearDiv);
+          });
+        });
+    }
+    // Initial load
+    loadNotes();
+  </script>
+</body>
+</html>

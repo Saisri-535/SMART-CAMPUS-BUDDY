@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Feedback</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { background: black; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; }
+    .container {
+      max-width: 500px; margin: 40px auto; background: black; border-radius: 16px;
+      box-shadow: 0 4px 24px white; padding: 32px 24px;
+    }
+    h2 { text-align: center; color: white; margin-bottom: 24px; }
+    .rating-label { color: white; font-weight: bold; }
+    form {
+      background: black; border-radius: 10px; padding: 20px; margin-bottom: 32px;
+      box-shadow: 0 2px 8px white;
+    }
+    form input, form textarea, form select, form button {
+      width: 100%; margin: 8px 0 16px 0; padding: 10px; border-radius: 6px;
+      border: 1px solid ; font-size: 16px; box-sizing: border-box;
+    }
+    form button {
+      background: white; color: black; border: none; font-weight: bold; cursor: pointer;
+      transition: background 0.2s;
+    }
+    form button:hover { background: yellow; }
+    #feedbackStatus { text-align: center; font-weight: 600; color: #279ac1; }
+    .feedback-list { margin-top: 30px; }
+    .feedback-card {
+      background:black; border-radius: 8px; box-shadow: 0 1px 4px rgba(39,154,193,0.07);
+      padding: 14px 18px; margin-bottom: 10px; border-left: 5px solid #279ac1;
+    }
+    .feedback-meta { font-size: 0.95em; color: #bfc9d1; }
+    .feedback-rating { font-weight: bold; color: #27ae60; }
+    @media (max-width: 600px) { .container { padding: 10px; } form { padding: 10px; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Feedback</h2>
+    <form id="feedbackForm"  action="http://localhost:3001/api/feedback" method="POST">
+       <input type="text" name="name" placeholder="Your Name (optional)" />
+      <label for="rating" class="rating-label">Rating</label>
+      <select id="rating" name="rating" required>
+        <option value="">Select a rating</option>
+        <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+        <option value="4">⭐⭐⭐⭐ Good</option>
+        <option value="3">⭐⭐⭐ Average</option>
+        <option value="2">⭐⭐ Poor</option>
+        <option value="1">⭐ Very Poor</option>
+      </select>
+      <textarea name="comments" placeholder="Your Comments" required></textarea>
+      <button type="submit">Submit Feedback</button>
+      <p id="feedbackStatus"></p>
+    </form>
+    <div class="feedback-list" id="feedbackList"></div>
+  </div>
+  <script>
+    // Submit handler
+    document.getElementById("feedbackForm").addEventListener("submit", async function(e){
+      e.preventDefault();
+      const formData = new FormData(this);
+      const data = {
+        name: formData.get("name"),
+        rating: formData.get("rating"),
+        comments: formData.get("comments")
+      };
+      const response = await fetch("http://localhost:3001/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      if (response.ok) {
+        document.getElementById("feedbackStatus").textContent = "Feedback submitted!";
+        this.reset();
+        loadFeedback();
+      } else {
+        document.getElementById("feedbackStatus").textContent = "Failed to submit feedback.";
+      }
+    });
+
+    // Display feedback
+    function loadFeedback() {
+      fetch("http://localhost:3001/api/feedback" )
+        .then(res => res.json())
+        .then(feedbacks => {
+          const list = document.getElementById("feedbackList");
+          list.innerHTML = "";
+          feedbacks.reverse().forEach(fb => {
+            const card = document.createElement("div");
+            card.className = "feedback-card";
+            card.innerHTML = `
+              <div><span class="feedback-rating">${"⭐".repeat(Number(fb.rating))}</span> - ${fb.comments}</div>
+              <div class="feedback-meta">By: ${fb.name} | ${new Date(fb.createdAt).toLocaleString()}</div>
+            `;
+            list.appendChild(card);
+          });
+        });
+    }
+    loadFeedback();
+  </script>
+</body>
+</html>
